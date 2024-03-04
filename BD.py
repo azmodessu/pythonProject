@@ -33,5 +33,3 @@ def clear():
     cur.execute("DELETE FROM sneakers")
     con.commit()
     con.close()
-
-export()
