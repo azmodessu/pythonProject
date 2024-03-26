@@ -68,11 +68,13 @@ users = cursor.fetchall()
 # Преобразуем результаты в список словарей
 
 # Выводим результаты
-users_list = []
-for user in users:
-  users_list.append(user)
+# users_list = []
+# for user in users:
+#   users_list.append(user)
+#
+# print(users_list[0])
+# print(users_list[1])
+# print(users_list[2])
+# connection.close()
 
-print(users_list[0])
-print(users_list[1])
-print(users_list[2])
-connection.close()
+sneakers.clear()
