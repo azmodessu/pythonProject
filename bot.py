@@ -3,17 +3,22 @@ import webbrowser
 from telebot import types
 import sneakers
 import Winter_shoes
+import gumshoes
 import sqlite3 as sq
 
 bot = telebot.TeleBot('6629859628:AAFvORL4yJ_HuOFmssrTQwEN4a7ulhgMN8s')
 
 markup_inline_sneakers = types.InlineKeyboardMarkup()
-button = types.InlineKeyboardButton('Следующий товар', callback_data='next_sneakers')
-markup_inline_sneakers.add(button)
+button_next_sneakers = types.InlineKeyboardButton('Следующий товар', callback_data='next_sneakers')
+markup_inline_sneakers.add(button_next_sneakers)
 
 markup_inline_wintershoes = types.InlineKeyboardMarkup()
-button = types.InlineKeyboardButton('Следующий товар', callback_data='next_wintershoes')
-markup_inline_wintershoes.add(button)
+button_next_wintershoes = types.InlineKeyboardButton('Следующий товар', callback_data='next_wintershoes')
+markup_inline_wintershoes.add(button_next_wintershoes)
+
+markup_inline_gumshoes = types.InlineKeyboardMarkup()
+button_next_gumshoes = types.InlineKeyboardButton('Следующий товар', callback_data='next_gumshoes')
+markup_inline_gumshoes.add(button_next_gumshoes)
 
 # counter_all = 0
 @bot.message_handler(commands=['start']) #обработки команды старт
@@ -38,8 +43,9 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_sneakers = types.KeyboardButton('Кроссовки')
         button_winter_shoes = types.KeyboardButton('Зимняя обувь')
+        button_gumshoes = types.KeyboardButton('Кеды')
         button_return = types.KeyboardButton('Вернуться в главное меню')
-        markup.add(button_sneakers, button_winter_shoes, button_return)
+        markup.add(button_sneakers, button_winter_shoes, button_gumshoes, button_return)
         bot.send_message(message.chat.id, 'Какая категория Вас интересует?', reply_markup=markup)
 
     elif(message.text == 'Вернуться в главное меню'):
@@ -77,15 +83,6 @@ def func(message):
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_next = types.KeyboardButton('Следующая модель кроссовок')
         markup_ifdatabase.add(button_return, button_next)
-
-
-
-        # markup_inline = types.InlineKeyboardMarkup()
-        # button = types.InlineKeyboardButton('Next', callback_data='next')
-        # markup_inline.add(button)
-
-
-
 
         # Устанавливаем соединение с базой данных
         con = sq.connect('sneakers.db')
@@ -193,6 +190,49 @@ def func(message):
         bot.send_message(message.chat.id, str(users_list[counter]).replace("'", "").replace("{", "").replace("}", ""),
                          reply_markup=markup_inline_wintershoes)
 
+    elif (message.text == 'Кеды'):
+        bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
+        gumshoes.export()
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button_return = types.KeyboardButton('Вернуться в главное меню')
+        button_xlsx = types.KeyboardButton('Таблица с кедами')
+        button_database = types.KeyboardButton('Выгрузка из базы данных с кедами')
+        markup.add(button_return, button_xlsx, button_database)
+        bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
+
+    elif (message.text == 'Таблица с кедами'):
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button_return = types.KeyboardButton('Вернуться в главное меню')
+        markup.add(button_return)
+        file = open('./gumshoes.xlsx', 'rb')
+        bot.send_document(message.chat.id, file)
+        bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup)
+
+    elif (message.text == 'Выгрузка из базы данных с кедами'):
+        markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button_return = types.KeyboardButton('Вернуться в главное меню')
+        button_next = types.KeyboardButton('Следующая модель кед')
+        markup_ifdatabase.add(button_return, button_next)
+
+        # Устанавливаем соединение с базой данных
+        con = sq.connect('sneakers.db')
+        cursor = con.cursor()
+
+        # Выбираем всех пользователей
+        cursor.execute('SELECT * FROM gumshoes')
+        users = cursor.fetchall()
+        con.close()
+
+        users_list = []
+        for user in users:
+            user_dict = {
+                'Название': str(user[0]),
+                'Цена': str(user[1]),
+                'Картинка': str(user[2])
+            }
+            users_list.append(user_dict)
+        bot.send_message(message.chat.id, str(users_list[counter]).replace("'", "").replace("{", "").replace("}", ""),
+                         reply_markup=markup_inline_gumshoes)
 
 @bot.message_handler(commands=['help'])
 def help(message):
@@ -238,7 +278,7 @@ def callback_next(callback):
             }
             users_list.append(user_dict)
 
-        bot.send_message(callback.message.chat.id, str(users_list[k]).replace("'", "").replace("{", "").replace("}", ""), reply_markup=markup_inline_sneakers)
+        bot.send_message(callback.message.chat.id, str(users_list[k]).replace("'", "").replace("{", "").replace("}", "").replace(", ", "\n"), reply_markup=markup_inline_sneakers)
 
     if callback.data == 'next_wintershoes':
         counter()
@@ -260,5 +300,27 @@ def callback_next(callback):
             }
             users_list.append(user_dict)
 
-        bot.send_message(callback.message.chat.id, str(users_list[k]).replace("'", "").replace("{", "").replace("}", ""), reply_markup=markup_inline_wintershoes)
-bot.polling(none_stop=True) #бесконечная работа бота
+        bot.send_message(callback.message.chat.id, str(users_list[k]).replace("'", "").replace("{", "").replace("}", "").replace(", ", "\n"), reply_markup=markup_inline_wintershoes)
+
+    if callback.data == 'next_gumshoes':
+        counter()
+
+        con = sq.connect('sneakers.db')
+        cursor = con.cursor()
+
+        # Выбираем всех пользователей
+        cursor.execute('SELECT * FROM gumshoes')
+        users = cursor.fetchall()
+        con.close()
+
+        users_list = []
+        for user in users:
+            user_dict = {
+                'Название': str(user[0]),
+                'Цена': str(user[1]),
+                'Картинка': str(user[2])
+            }
+            users_list.append(user_dict)
+
+        bot.send_message(callback.message.chat.id, str(users_list[k]).replace("'", "").replace("{", "").replace("}", "").replace(", ", "\n"), reply_markup=markup_inline_gumshoes)
+#bot.polling(none_stop=True) #бесконечная работа бота

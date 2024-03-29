@@ -63,7 +63,7 @@ def export():
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
 
-    s = Service('C:/chromedriver.exe')
+    s = Service('C:/Users/denis/Downloads/chromedriver.exe')
     driver = webdriver.Chrome(service=s)
 
     stealth(driver,
