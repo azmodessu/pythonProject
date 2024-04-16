@@ -74,9 +74,44 @@ def export():
     con.close()
 
 
+def check_table_exists(db_path, table_name):
+    # Подключение к базе данных
+    con = sq.connect(db_path)
+    cur = con.cursor()
+
+    # Проверка наличия таблицы
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", (table_name,))
+    exists = cur.fetchone()
+
+    # Закрытие соединения с базой данных
+    con.close()
+
+    # Возвращает True, если таблица существует, иначе False
+    return exists is not None
+
 def clear():
     con = sq.connect("sneakers.db")
     cur = con.cursor()
-    cur.execute("DELETE FROM winter_shoes")
-    con.commit()
-    con.close()
+    # cur.execute("DELETE FROM winter_shoes")
+    # con.commit()
+    # con.close()
+
+    # cur.execute(f"SELECT COUNT(*) FROM winter_shoes WHERE title IS NULL;")
+    # count = cur.fetchone()[0]
+    # if count > 0:
+    #     con.commit()
+    #     con.close()
+    # else:
+    #     cur.execute("DELETE FROM winter_shoes")
+    #     con.commit()
+    #     con.close()
+
+    db_path = 'sneakers.db'
+    table_name = 'winter_shoes'
+    if check_table_exists(db_path, table_name):
+        cur.execute("DELETE FROM winter_shoes")
+        con.commit()
+        con.close()
+    else:
+        con.commit()
+        con.close()

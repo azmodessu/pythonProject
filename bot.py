@@ -65,7 +65,8 @@ def start(message):
     button_choose = types.KeyboardButton('Выбор категории')
     button_site = types.KeyboardButton('Перейти на сайт магазина')
     button_added = types.KeyboardButton('Посмотреть избранное')
-    markup_outline.add(button_choose, button_site, button_added)
+    button_clear_added = types.KeyboardButton('Очистить избранное')
+    markup_outline.add(button_choose, button_site, button_added, button_clear_added)
 
     bot.send_message(message.chat.id, f'<b>Привет, {message.from_user.first_name}! \nЯ могу помочь тебе с выбором '
                                       f'обуви на сайте SneakerHead!</b>',
@@ -92,12 +93,18 @@ def func(message):
         button_choose = types.KeyboardButton('Выбор категории')
         button_site = types.KeyboardButton('Перейти на сайт магазина')
         button_added = types.KeyboardButton('Посмотреть избранное')
-        markup_outline.add(button_choose, button_site, button_added)
+        button_clear_added = types.KeyboardButton('Очистить избранное')
+        markup_outline.add(button_choose, button_site, button_added, button_clear_added)
         bot.send_message(message.chat.id, f'<b>Привет, {message.from_user.first_name}! \nЯ могу помочь тебе с выбором '
                                           f'обуви на сайте SneakerHead!</b>',
                          parse_mode='html', reply_markup=markup_outline)
 
     elif (message.text == 'Посмотреть избранное'):
+        markup_added = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        button_return = types.KeyboardButton('Вернуться в главное меню')
+        button_clear_added = types.KeyboardButton('Очистить избранное')
+        markup_added.add(button_return, button_clear_added)
+
         added.export(added_shoes)
 
         con = sq.connect('sneakers.db')
@@ -110,12 +117,18 @@ def func(message):
         shoes_in_added_list = []
         for shoe in shoes_in_added:
             shoes_in_added_list.append(shoe)
+        if len(shoes_in_added) != 0:
+            bot.send_message(message.chat.id, (
+                str(shoes_in_added_list).replace('(', '').replace(')', '').replace(',',
+                                                                                   '\n').replace('[', '').replace(']',
+                                                                                                                  '').replace(
+                    "'", '')), reply_markup=markup_added)
+        else:
+            bot.send_message(message.chat.id, "В избранном нет товаров!")
 
-        bot.send_message(message.chat.id, (
-            str(shoes_in_added_list).replace('(', '').replace(')', '').replace(',',
-                                                                               '\n').replace('[', '').replace(']',
-                                                                                                              '').replace(
-                "'", '')))
+    elif (message.text == 'Очистить избранное'):
+        added_shoes.clear()
+        bot.send_message(message.chat.id, "Избранное очищено!")
 
     elif (message.text == 'Кроссовки'):
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
@@ -124,20 +137,20 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_xlsx = types.KeyboardButton('Таблица с кроссовками')
-        button_database = types.KeyboardButton('Выгрузка из базы данных с кроссовками')
+        button_database = types.KeyboardButton('Карточки с кроссовками')
 
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
     elif (message.text == 'Таблица с кроссовками'):
-        markup_ifxslx = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        markup_ifxlsx = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
-        markup_ifxslx.add(button_return)
+        markup_ifxlsx.add(button_return)
         file = open('./sneakers.xlsx', 'rb')
         bot.send_document(message.chat.id, file)
-        bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup_ifxslx)
+        bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup_ifxlsx)
 
-    elif (message.text == 'Выгрузка из базы данных с кроссовками'):
+    elif (message.text == 'Карточки с кроссовками'):
         counter_all()
         counter_sneakers()
         markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -173,7 +186,7 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_xlsx = types.KeyboardButton('Таблица с зимней обувью')
-        button_database = types.KeyboardButton('Выгрузка из базы данных с зимней обувью')
+        button_database = types.KeyboardButton('Карточки с зимней обувью')
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
@@ -185,7 +198,7 @@ def func(message):
         bot.send_document(message.chat.id, file)
         bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup)
 
-    elif (message.text == 'Выгрузка из базы данных с зимней обувью'):
+    elif (message.text == 'Карточки с зимней обувью'):
         counter_all()
         counter_wintershoes()
         markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -211,7 +224,9 @@ def func(message):
         all_shoes_list.append(
             wintershoes_list[k_wintershoes]['Название'] + ' tabulation ' + wintershoes_list[k_wintershoes]['Ссылка'])
         bot.send_message(message.chat.id,
-                         str(wintershoes_list[k_wintershoes]).replace("'", "").replace("{", "").replace("}", ""),
+                         str(wintershoes_list[k_wintershoes]).replace("'", "").replace("{", "").replace("}",
+                                                                                                        "").replace(
+                             ", ", "\n"),
                          reply_markup=markup_inline_wintershoes)
 
     elif (message.text == 'Кеды'):
@@ -220,7 +235,7 @@ def func(message):
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_xlsx = types.KeyboardButton('Таблица с кедами')
-        button_database = types.KeyboardButton('Выгрузка из базы данных с кедами')
+        button_database = types.KeyboardButton('Карточки с кедами')
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
@@ -232,7 +247,7 @@ def func(message):
         bot.send_document(message.chat.id, file)
         bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup)
 
-    elif (message.text == 'Выгрузка из базы данных с кедами'):
+    elif (message.text == 'Карточки с кедами'):
         counter_all()
         counter_gumshoes()
         markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -258,7 +273,8 @@ def func(message):
         all_shoes_list.append(
             gumshoes_list[k_gumshoes]['Название'] + ' tabulation ' + gumshoes_list[k_gumshoes]['Ссылка'])
         bot.send_message(message.chat.id,
-                         str(gumshoes_list[k_gumshoes]).replace("'", "").replace("{", "").replace("}", ""),
+                         str(gumshoes_list[k_gumshoes]).replace("'", "").replace("{", "").replace("}", "").replace(", ",
+                                                                                                                   "\n"),
                          reply_markup=markup_inline_gumshoes)
 
 
@@ -371,3 +387,4 @@ def callback_next(callback):
         print(all_shoes_list[k_all])
         added_shoes.append(all_shoes_list[k_all])
         print(added_shoes)
+        bot.send_message(callback.message.chat.id, "Товар добавлен в избранное!")
