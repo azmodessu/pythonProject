@@ -132,7 +132,7 @@ def func(message):
 
     elif (message.text == 'Кроссовки'):
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
-        sneakers.export()
+        sneakers.get_data()
 
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
@@ -153,9 +153,6 @@ def func(message):
     elif (message.text == 'Карточки с кроссовками'):
         counter_all()
         counter_sneakers()
-        markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
-        button_return = types.KeyboardButton('Вернуться в главное меню')
-        markup_ifdatabase.add(button_return)
 
         con = sq.connect('sneakers.db')
         cursor = con.cursor()
@@ -182,7 +179,7 @@ def func(message):
 
     elif (message.text == 'Зимняя обувь'):
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
-        Winter_shoes.export()
+        Winter_shoes.get_data()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_xlsx = types.KeyboardButton('Таблица с зимней обувью')
@@ -231,7 +228,7 @@ def func(message):
 
     elif (message.text == 'Кеды'):
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
-        gumshoes.export()
+        gumshoes.get_data()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_xlsx = types.KeyboardButton('Таблица с кедами')
@@ -384,7 +381,5 @@ def callback_next(callback):
                          reply_markup=markup_inline_gumshoes)
 
     if callback.data == 'add':
-        print(all_shoes_list[k_all])
         added_shoes.append(all_shoes_list[k_all])
-        print(added_shoes)
         bot.send_message(callback.message.chat.id, "Товар добавлен в избранное!")

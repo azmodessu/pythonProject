@@ -7,7 +7,7 @@ from selenium.webdriver.chrome.service import Service
 import openpyxl
 
 
-def export():
+def get_data():
     clear()
     wb = Workbook()
     ws = wb.active
@@ -18,7 +18,7 @@ def export():
     options.add_argument("start-maximized")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
-    s = Service('C:/Users/denis/Downloads/chromedriver.exe')
+    s = Service('chromedriver.exe')
     driver = webdriver.Chrome(service=s)
     stealth(driver,
             languages=["en-US", "en"],
@@ -74,41 +74,13 @@ def export():
     con.close()
 
 
-def check_table_exists(db_path, table_name):
-    # Подключение к базе данных
-    con = sq.connect(db_path)
-    cur = con.cursor()
-
-    # Проверка наличия таблицы
-    cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", (table_name,))
-    exists = cur.fetchone()
-
-    # Закрытие соединения с базой данных
-    con.close()
-
-    # Возвращает True, если таблица существует, иначе False
-    return exists is not None
-
 def clear():
     con = sq.connect("sneakers.db")
     cur = con.cursor()
-    # cur.execute("DELETE FROM winter_shoes")
-    # con.commit()
-    # con.close()
-
-    # cur.execute(f"SELECT COUNT(*) FROM winter_shoes WHERE title IS NULL;")
-    # count = cur.fetchone()[0]
-    # if count > 0:
-    #     con.commit()
-    #     con.close()
-    # else:
-    #     cur.execute("DELETE FROM winter_shoes")
-    #     con.commit()
-    #     con.close()
-
-    db_path = 'sneakers.db'
-    table_name = 'winter_shoes'
-    if check_table_exists(db_path, table_name):
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cur.fetchall()
+    table_names = [table[0] for table in tables]
+    if 'winter_shoes' in table_names:
         cur.execute("DELETE FROM winter_shoes")
         con.commit()
         con.close()

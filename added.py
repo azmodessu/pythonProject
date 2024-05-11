@@ -19,6 +19,13 @@ def export(added_shoes):
 def clear():
     con = sq.connect("sneakers.db")
     cur = con.cursor()
-    cur.execute("DELETE FROM added_shoes")
-    con.commit()
-    con.close()
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cur.fetchall()
+    table_names = [table[0] for table in tables]
+    if 'sneakers' in table_names:
+        cur.execute("DELETE FROM added_shoes")
+        con.commit()
+        con.close()
+    else:
+        con.commit()
+        con.close()

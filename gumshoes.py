@@ -7,7 +7,7 @@ import sqlite3 as sq
 import openpyxl
 
 
-def export():
+def get_data():
     clear()
     wb = Workbook()
     ws = wb.active
@@ -18,7 +18,7 @@ def export():
     options.add_argument("start-maximized")
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
     options.add_experimental_option('useAutomationExtension', False)
-    s = Service('C:/Users/denis/Downloads/chromedriver.exe')
+    s = Service('chromedriver.exe')
     driver = webdriver.Chrome(service=s)
     stealth(driver,
             languages=["en-US", "en"],
@@ -47,7 +47,6 @@ def export():
                                                                              "product-card__title").find_element(
             By.CLASS_NAME, "product-card__link").get_attribute("href")
         ws.append([title, price, image, link])
-        print(title, price, image, link)
 
     wb.save('gumshoes.xlsx')
     wb.close()
@@ -75,6 +74,13 @@ def export():
 def clear():
     con = sq.connect("sneakers.db")
     cur = con.cursor()
-    cur.execute("DELETE FROM gumshoes")
-    con.commit()
-    con.close()
+    cur.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cur.fetchall()
+    table_names = [table[0] for table in tables]
+    if 'gumshoes' in table_names:
+        cur.execute("DELETE FROM gumshoes")
+        con.commit()
+        con.close()
+    else:
+        con.commit()
+        con.close()
