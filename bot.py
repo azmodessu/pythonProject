@@ -75,11 +75,11 @@ def start(message):
 
 @bot.message_handler(content_types=['text'])
 def func(message):
-    if (message.text == 'Перейти на сайт магазина'):
+    if message.text == 'Перейти на сайт магазина':
         bot.send_message(message.chat.id, 'Выполняется переход на сайт магазина (https://sneakerhead.ru)')
         webbrowser.open('https://sneakerhead.ru')
 
-    elif (message.text == 'Выбор категории'):
+    elif message.text == 'Выбор категории':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_sneakers = types.KeyboardButton('Кроссовки')
         button_winter_shoes = types.KeyboardButton('Зимняя обувь')
@@ -88,7 +88,7 @@ def func(message):
         markup.add(button_sneakers, button_winter_shoes, button_gumshoes, button_return)
         bot.send_message(message.chat.id, 'Какая категория Вас интересует?', reply_markup=markup)
 
-    elif (message.text == 'Вернуться в главное меню'):
+    elif message.text == 'Вернуться в главное меню':
         markup_outline = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_choose = types.KeyboardButton('Выбор категории')
         button_site = types.KeyboardButton('Перейти на сайт магазина')
@@ -99,7 +99,7 @@ def func(message):
                                           f'обуви на сайте SneakerHead!</b>',
                          parse_mode='html', reply_markup=markup_outline)
 
-    elif (message.text == 'Посмотреть избранное'):
+    elif message.text == 'Посмотреть избранное':
         markup_added = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         button_clear_added = types.KeyboardButton('Очистить избранное')
@@ -126,11 +126,11 @@ def func(message):
         else:
             bot.send_message(message.chat.id, "В избранном нет товаров!")
 
-    elif (message.text == 'Очистить избранное'):
+    elif message.text == 'Очистить избранное':
         added_shoes.clear()
         bot.send_message(message.chat.id, "Избранное очищено!")
 
-    elif (message.text == 'Кроссовки'):
+    elif message.text == 'Кроссовки':
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
         sneakers.get_data()
 
@@ -142,7 +142,7 @@ def func(message):
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
-    elif (message.text == 'Таблица с кроссовками'):
+    elif message.text == 'Таблица с кроссовками':
         markup_ifxlsx = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         markup_ifxlsx.add(button_return)
@@ -150,7 +150,7 @@ def func(message):
         bot.send_document(message.chat.id, file)
         bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup_ifxlsx)
 
-    elif (message.text == 'Карточки с кроссовками'):
+    elif message.text == 'Карточки с кроссовками':
         counter_all()
         counter_sneakers()
 
@@ -177,7 +177,7 @@ def func(message):
                          str(sneakers_list[k_sneakers]).replace("'", "").replace("{", "").replace("}", ""),
                          reply_markup=markup_inline_sneakers)
 
-    elif (message.text == 'Зимняя обувь'):
+    elif message.text == 'Зимняя обувь':
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
         Winter_shoes.get_data()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -187,7 +187,7 @@ def func(message):
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
-    elif (message.text == 'Таблица с зимней обувью'):
+    elif message.text == 'Таблица с зимней обувью':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         markup.add(button_return)
@@ -195,7 +195,7 @@ def func(message):
         bot.send_document(message.chat.id, file)
         bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup)
 
-    elif (message.text == 'Карточки с зимней обувью'):
+    elif message.text == 'Карточки с зимней обувью':
         counter_all()
         counter_wintershoes()
         markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -226,7 +226,7 @@ def func(message):
                              ", ", "\n"),
                          reply_markup=markup_inline_wintershoes)
 
-    elif (message.text == 'Кеды'):
+    elif message.text == 'Кеды':
         bot.send_message(message.chat.id, 'Идёт сбор информации, пожалуйста подождите')
         gumshoes.get_data()
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -236,7 +236,7 @@ def func(message):
         markup.add(button_return, button_xlsx, button_database)
         bot.send_message(message.chat.id, 'В каком виде предоставить информацию?', reply_markup=markup)
 
-    elif (message.text == 'Таблица с кедами'):
+    elif message.text == 'Таблица с кедами':
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         button_return = types.KeyboardButton('Вернуться в главное меню')
         markup.add(button_return)
@@ -244,7 +244,7 @@ def func(message):
         bot.send_document(message.chat.id, file)
         bot.send_message(message.chat.id, 'Таблица с полученными данными', reply_markup=markup)
 
-    elif (message.text == 'Карточки с кедами'):
+    elif message.text == 'Карточки с кедами':
         counter_all()
         counter_gumshoes()
         markup_ifdatabase = types.ReplyKeyboardMarkup(resize_keyboard=True)
