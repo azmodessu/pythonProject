@@ -2,3 +2,4 @@
 Ссылки для скачивания chromedriver:
 https://chromedriver.chromium.org/downloads
 https://googlechromelabs.github.io/chrome-for-testing/
+id бота: https://t.me/SneakerSpyBot
